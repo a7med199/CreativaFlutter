@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369053794704",
+    "project_id": "creativa-42",
+    "storage_bucket": "creativa-42.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369053794704:android:e8c14846bdc6f5d10e7315",
+        "android_client_info": {
+          "package_name": "com.example.untitled1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAik0MD3-b6ynEksjqANtyzKEK5eFhuws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
