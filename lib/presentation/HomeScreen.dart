@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:untitled1/logic/get_notes/cubil.dart';
 import 'package:untitled1/logic/get_notes/state.dart';
 import 'package:untitled1/presentation/create_note_screen.dart';
@@ -73,8 +75,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 22),
 
-              ListView.builder<GetNoteCubit, GetNoteStates>(
-                  child: NoteWidget()),
+              BlocBuilder<GetNoteCubit, GetNoteStates>(
+                builder: (context, state) {
+                  if (state is GetNoteLoadingState){
+                    return Center(child: CircularProgressIndicator());
+                  }else if (state is GetNoteSuccessState){
+                    final x = state.notesData;
+                    return SizedBox(
+                      height: 700,
+                      child: ListView.builder(
+                        itemCount: x.length,
+                        itemBuilder: (context, index) {
+                          final y = x[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8),
+                            child: NoteWidget(
+                              noteModel: y,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }else if (state is GetNoteErrorState){
+                    return Center(child: Text(state.message));
+                  }else {
+                    return SizedBox();
+                  }
+                },
+              ),
             ],
           ),
         ),

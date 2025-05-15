@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/note_model.dart';
+
 class NoteWidget extends StatelessWidget {
-  const NoteWidget({super.key});
+  NoteModel noteModel;
+  NoteWidget({super.key,required this.noteModel});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +20,11 @@ class NoteWidget extends StatelessWidget {
             color: const Color.fromRGBO(242, 214, 241, 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Column(
+          child:  Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Meeting",
+              Text(noteModel.headline,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -34,12 +37,12 @@ class NoteWidget extends StatelessWidget {
                   MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                        "Excepteur sint occaecat cupidatat non proiden.",
+                        noteModel.description,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.w300)),
-                    Text("9.00 am",
+                    Text("${noteModel.createdAt.hour}:${noteModel.createdAt.minute}${noteModel.createdAt.hour>12 ? "PM" : "AM" }",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
