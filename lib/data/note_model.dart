@@ -1,30 +1,31 @@
 class NoteModel {
-  // headline
-  // description
-  // createdAt
-  final String headline;
+  final String headLine;
   final String description;
+  final String ?mediaUrl;
   final DateTime createdAt;
 
   NoteModel({
-    required this.headline,
+    required this.headLine,
     required this.description,
     required this.createdAt,
+    this.mediaUrl,
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
     return NoteModel(
-      headline: json['headline'] as String,
+      headLine: json['headLine'] as String,
       description: json['description'] as String,
+      mediaUrl: json['mediaUrl'] ?? "" ,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-    'headline': headline,
-    'description': description,
-    'createdAt': createdAt.toIso8601String(),
+      'headLine': headLine,
+      'mediaUrl': mediaUrl ?? "",
+      'description': description,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 }

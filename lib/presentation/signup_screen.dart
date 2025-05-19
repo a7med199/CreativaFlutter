@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../logic/signup/cubil.dart';
+import '../core/colors_manager.dart';
+import '../logic/signup/cubit.dart';
 import '../logic/signup/state.dart';
-import 'HomeScreen.dart';
+import 'home_screen.dart';
 
-class SignUpScreen extends StatefulWidget {
- const SignUpScreen({super.key});
+class SignUpScreen extends StatelessWidget {
+  SignUpScreen({super.key});
 
-  @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController emailController  = TextEditingController();
-
-  TextEditingController passController  = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,44 +18,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
       create: (context) => SignUpCubit(),
       child: BlocConsumer<SignUpCubit, SignUpStates>(
         listener: (context, state) {
-          if (state is SignUpSuccessState) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Your Account Was Created Successfully")));
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return HomeScreen();
-            },));
-
-          }else if (state is SignUpErrorState){
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(state.em)));
+          if(state is SignUpSuccessState){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
           }
+
         },
-        builder: (context,state){
-          return  Scaffold(
-            backgroundColor: Color.fromRGBO(18, 3, 17, 1),
+        builder: (context, state) {
+          return Scaffold(
+            backgroundColor: ColorsManagers.primaryColor,
             body: Padding(
-              padding: const EdgeInsets.only(left: 32, top: 80, right: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(
+                    height: 70,
+                  ),
                   Center(
                     child: Text(
-                      "Create Account",
+                      "Create New Account ".trim(),
                       style: TextStyle(
-                          color: Colors.white,
                           fontSize: 24,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                   SizedBox(
-                    height: 50,
+                    height: 20,
                   ),
                   Text(
-                    "Email",
+                    "Email ",
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
                   ),
                   SizedBox(
                     height: 12,
@@ -69,64 +60,73 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: emailController,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
                     ),
                     decoration: InputDecoration(
-                        hintText: "example@gmail.com",
+                        hintText: "example@gmail.com".trim(),
+                        fillColor: ColorsManagers.lightPurple,
                         filled: true,
-                        fillColor: Color.fromRGBO(242, 214, 241, 0.08),
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300),
                         border: InputBorder.none),
                   ),
                   SizedBox(
                     height: 12,
                   ),
                   Text(
-                    "Password",
+                    "password ".trim(),
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
                   ),
                   SizedBox(
                     height: 12,
                   ),
                   TextFormField(
                     controller: passController,
+                    obscureText: true,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
                     ),
                     decoration: InputDecoration(
-                        hintText: "Enter Your Password",
+                        hintText: "Enter Your password".trim(),
+                        fillColor: ColorsManagers.lightPurple,
                         filled: true,
-                        fillColor: Color.fromRGBO(242, 214, 241, 0.08),
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300),
                         border: InputBorder.none),
                   ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      context.read<SignUpCubit>().signUp(emailController.text, passController.text);
-                    },
-                    child: Center(
+                  Spacer(),
+                  Center(
+                    child: InkWell(
+                      onTap: () {
+                        context.read<SignUpCubit>().signUp(emailController.text, passController.text);
+                      },
                       child: Container(
-                          width: 312,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.white,
+                        width: 312,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Sign Up".trim(),
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: ColorsManagers.primaryColor),
                           ),
-                          child: Center(child: Text("SignUp",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold
-                              )
-                          ),
-                          ),
-                        )
+                        ),
+                      ),
                     ),
+                  ),
+                  SizedBox(
+                    height: 30,
                   ),
                 ],
               ),

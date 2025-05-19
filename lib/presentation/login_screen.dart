@@ -1,200 +1,242 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:untitled1/logic/login/cubil.dart';
+import 'package:untitled1/logic/login/cubit.dart';
 import 'package:untitled1/logic/login/state.dart';
 import 'package:untitled1/presentation/signup_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'home_screen.dart';
 
-import 'HomeScreen.dart';
+import '../core/colors_manager.dart';
 
-class LoginScreen extends StatefulWidget {
-   LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController emailController  = TextEditingController();
+  Future<UserCredential?> _signInWithGoogle() async {
+    try {
+      // Trigger the Google Sign-In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-  TextEditingController passController  = TextEditingController();
+      if (googleUser == null) return null;
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
+
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      return await _auth.signInWithCredential(credential);
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+
     return BlocProvider(
       create: (context) => LoginCubit(),
       child: BlocConsumer<LoginCubit, LoginStates>(
-
         listener: (context, state) {
+          if (state is LoginSuccessState) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text("Login is Successfully ".trim())));
 
-      if (state is LoginSuccessState) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Your Account Was Created Successfully")));
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return HomeScreen();
-        },));
-
-      }else if (state is LoginErrorState){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(state.em)));
-      }
-    },
-          // TODO: implement listener
-
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          } else if (state is LoginErrorState){
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.em)));
+          }
+        },
         builder: (context, state) {
           return Scaffold(
-              backgroundColor: Color.fromRGBO(18, 3, 17, 1),
-              body: Padding(
-                padding: const EdgeInsets.only(left: 32.0, top: 80, right: 32),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            backgroundColor: ColorsManagers.primaryColor,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 70,
+                  ),
+                  Center(
+                    child: Text(
+                      "Hi, welcome back".trim(),
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    "Email".trim(),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  TextFormField(
+                    controller: emailController,
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: InputDecoration(
+                        hintText: "example@gmail.com",
+                        fillColor: ColorsManagers.lightPurple,
+                        filled: true,
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300),
+                        border: InputBorder.none),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    "password ".trim(),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  TextFormField(
+                    controller: passController,
+                    obscureText: true,
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: InputDecoration(
+                        hintText: "Enter Your password".trim(),
+                        fillColor: ColorsManagers.lightPurple,
+                        filled: true,
+                        hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300),
+                        border: InputBorder.none),
+                  ),
 
-                      Center(
-                        child: Text(
-                            "HI, Welcome back",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold
+                  SizedBox(height: 40,),
 
-                            )
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                          "Email",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold
-
-                          )
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      TextFormField(
-                        controller: emailController,
-                        style: TextStyle(
+                  Center(
+                    child: InkWell(
+                      onTap: () {
+                        context
+                            .read<LoginCubit>()
+                            .loginEmailAndPass(emailController.text, passController.text);
+                      },
+                      child: Container(
+                        width: 312,
+                        height: 48,
+                        decoration: BoxDecoration(
                           color: Colors.white,
-                          fontSize: 14,
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        decoration: InputDecoration(
-                            hintText: "example@gmail.com",
-                            filled: true,
-                            fillColor: Color.fromRGBO(242, 214, 241, 0.08),
-                            border: InputBorder.none
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 14,
-                      ),
-
-                      Text(
-                          "Password",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold
-
-                          )
-                      ),
-
-                      SizedBox(
-                        height: 14,
-                      ),
-
-                      TextFormField(
-                        controller: passController,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
-                        decoration: InputDecoration(
-                            hintText: "Enter Your Password",
-                            filled: true,
-                            fillColor: Color.fromRGBO(242, 214, 241, 0.08),
-                            border: InputBorder.none
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.read<LoginCubit>().Login(emailController.text, passController.text);
-                        },
                         child: Center(
-                            child: Container(
-                              width: 312,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              child: Center(child: Text("Login",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold
-                                  )
-                              ),
-                              ),
-                            )
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-
-                      InkWell(
-                        onTap: () {
-
-                        },
-
-                        child: Center(
-                            child: Container(
-
-                              width: 312,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-
-                              child: Center(child: Text("Continue With Gmail",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold
-                                  )
-                              ),
-                              ),
-                            )
-                        ),
-                      ),
-                      SizedBox(
-                        height: 240,
-                      ),
-
-
-                      Center(
-                        child: TextButton(onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => SignUpScreen()));
-                        }, child: Text("Do not have an account? SignUp",
+                          child: Text(
+                            "Login".trim(),
                             style: TextStyle(
-                                color: Colors.white,
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold
-                            )
-                        ),),
+                                fontWeight: FontWeight.w600,
+                                color: ColorsManagers.primaryColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Center(
+                    child: InkWell(
+                      onTap: () {
+                        context.read<LoginCubit>().continueWithGoogle();
+
+                      },
+                      child: Container(
+                        width: 312,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset("assets/logos/Google.png",height: 30,width: 30,),
+                            SizedBox(
+                              width: 10,
+                            ),
+
+                            Center(
+                              child: Text(
+                                "Continue With Google".trim(),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorsManagers.primaryColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 280,),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don’t have an account ? ".trim(),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignUpScreen()));
+                        },
+                        child: Text(
+                          "Sign Up".trim(),
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
                       )
-                    ]
-                ),
-              )
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
         },
       ),

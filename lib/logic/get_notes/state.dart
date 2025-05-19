@@ -2,17 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:untitled1/data/note_model.dart';
 
 @immutable
-abstract class GetNoteStates {}
+class GetNoteDataStates {}
 
-class GetNoteInitialState extends GetNoteStates {}
-class GetNoteLoadingState extends GetNoteStates {}
+class GetNoteInitialState extends GetNoteDataStates{}
 
-class GetNoteSuccessState extends GetNoteStates {
-  final List<NoteModel> notesData;
-  GetNoteSuccessState({required this.notesData});
+class GetNoteLoadingState extends GetNoteDataStates{}
+
+class GetNoteSuccessState extends GetNoteDataStates{
+  List <NoteModel> notes;
+  GetNoteSuccessState ({required this.notes});
 }
 
-class GetNoteErrorState extends GetNoteStates {
-  final String message;
-  GetNoteErrorState({required this.message});
+class GetNoteErrorState extends GetNoteDataStates{
+  final String em;
+  GetNoteErrorState(this.em);
 }

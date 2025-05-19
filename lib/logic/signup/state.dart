@@ -6,7 +6,4 @@ class SignUpLoadingState extends SignUpStates{}
 
 class SignUpSuccessState extends SignUpStates{}
 
-class SignUpErrorState extends SignUpStates{
-  String em;
-  SignUpErrorState({required this.em});
-}
+class SignUpErrorState extends SignUpStates{}
