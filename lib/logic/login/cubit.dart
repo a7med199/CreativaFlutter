@@ -7,9 +7,6 @@ import 'package:untitled1/logic/login/state.dart';
 class LoginCubit extends Cubit <LoginStates> {
   LoginCubit () : super (LoginInitialState());
 
-
-
-  ///
   Future loginEmailAndPass (String userEmail, String pass)async{
     emit(LoginLoadingState());
     try {

@@ -186,6 +186,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                         color: Colors.white),
                   ),
                   SizedBox(height: 12),
+                  
                   TextFormField(
                     controller: descriptionController,
                     style: TextStyle(color: Colors.white),

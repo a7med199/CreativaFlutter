@@ -15,6 +15,20 @@ class LoginScreen extends StatelessWidget {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   Future<UserCredential?> _signInWithGoogle() async {
     try {
       // Trigger the Google Sign-In flow
@@ -173,8 +187,8 @@ class LoginScreen extends StatelessWidget {
                   Center(
                     child: InkWell(
                       onTap: () {
+                        signInWithGoogle();
                         context.read<LoginCubit>().continueWithGoogle();
-
                       },
                       child: Container(
                         width: 312,
@@ -183,6 +197,7 @@ class LoginScreen extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(5),
                         ),
+
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
